@@ -14,5 +14,14 @@ namespace CrossExchange
         {
             return _dbContext.Portfolios.Include(x => x.Trade).AsQueryable();
         }
+
+       
+
+       public bool IsRegisterd(int id )
+        {
+            if (_dbContext.Find<Portfolio>(new object[] { "id", id }) == null)
+                return false;
+            return true;
+        }
     }
 }

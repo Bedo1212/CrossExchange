@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CrossExchange.Controller
 {
     [Route("api/Trade")]
+   
     public class TradeController : ControllerBase
     {
         private IShareRepository _shareRepository { get; set; }
@@ -32,7 +33,20 @@ namespace CrossExchange.Controller
         }
 
 
+       
+        public HourlyShareRate GetCurrentRate(string symbol)
+        {
+           
+            var query = (from p in _shareRepository.Query()
+                        where p.Symbol == symbol orderby p.TimeStamp descending
+                        select  p).FirstOrDefault<HourlyShareRate>() ;
 
+            var lastRate = query;
+            if (lastRate != null)
+                return lastRate;
+            else
+                return null;
+        }
         /*************************************************************************************************************************************
         For a given portfolio, with all the registered shares you need to do a trade which could be either a BUY or SELL trade. For a particular trade keep following conditions in mind:
 		BUY:
@@ -50,8 +64,17 @@ namespace CrossExchange.Controller
         *************************************************************************************************************************************/
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]TradeModel model)
+        [Route("/buy")]
+        public async Task<IActionResult> buy([FromBody]TradeModel model)
         {
+            if (_portfolioRepository.IsRegisterd(1))
+            {
+                var hourlyrate =  GetCurrentRate(model.Symbol);
+
+
+            }
+            else
+                return BadRequest();
             return Created("Trade", model);
         }
         
